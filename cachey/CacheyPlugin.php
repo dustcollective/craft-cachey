@@ -3,38 +3,41 @@ namespace Craft;
 class CacheyPlugin extends BasePlugin {
 
 
-    function rrmdir($dir) { 
-        if (is_dir($dir)) { 
-             $objects = scandir($dir); 
+    function rrmdir($dir) {
+        if (is_dir($dir)) {
+             $objects = scandir($dir);
              //print_r($objects);
-             foreach ($objects as $object) { 
-               if ($object != "." && $object != "..") { 
+             foreach ($objects as $object) {
+               if ($object != "." && $object != "..") {
                  if (is_dir($dir."/".$object))
                    $this->rrmdir($dir."/".$object);
                  else
-                   unlink($dir."/".$object); 
-               } 
+                   unlink($dir."/".$object);
+               }
             }
-            rmdir($dir); 
-        } 
+            rmdir($dir);
+        }
     }
 
     function init() {
-        craft()->entries->onSaveEntry = function(Event $event) {
-            $path = realpath(CRAFT_BASE_PATH . DIRECTORY_SEPARATOR . '../../cache'); 
+		if (craft()->config->get('devMode')) {
 
-            $files = glob($path . '/*'); // get all file names
+			craft()->entries->onSaveEntry = function(Event $event) {
+				$path = realpath(CRAFT_BASE_PATH . DIRECTORY_SEPARATOR . '../../cache');
 
-            //print_r($files);
+				$files = glob($path . '/*'); // get all file names
 
-            foreach($files as $file) { // iterate files
-                if (is_dir($file)) {
-                    $this->rrmdir($file);
-                } else if (is_file($file)) {
-                    unlink($file); 
-                }
-            }
-        };
+				//print_r($files);
+
+				foreach($files as $file) { // iterate files
+					if (is_dir($file)) {
+						$this->rrmdir($file);
+					} else if (is_file($file)) {
+						unlink($file);
+					}
+				}
+			};
+		}
     }
 
     function getName()
