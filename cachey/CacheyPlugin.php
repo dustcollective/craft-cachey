@@ -20,7 +20,7 @@ class CacheyPlugin extends BasePlugin {
     }
 
     function init() {
-		if (craft()->config->get('devMode')) {
+		if (!craft()->config->get('devMode')) {
 
 			craft()->entries->onSaveEntry = function(Event $event) {
 				$path = realpath(CRAFT_BASE_PATH . DIRECTORY_SEPARATOR . '../../cache');
